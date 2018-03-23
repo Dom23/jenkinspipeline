@@ -1,5 +1,15 @@
 pipeline {
     agent any
+    
+    parameters { 
+         string(name: 'tomcat_dev', defaultValue: 'localhost:8090', description: 'Staging Server')
+         string(name: 'tomcat_prod', defaultValue: 'localhost:9090', description: 'Production Server')
+    } 
+    
+    triggers {
+         pollSCM('* * * * *') // Polling Source Control
+     }
+
 
 stages{
         stage('Build'){
@@ -14,30 +24,19 @@ stages{
             }
         }
 		
-		stage ('Deploy to Staging'){
-            steps {
-                build job: 'Deploy-to-staging'
-            }
-        }
-        
-        stage ('Deploy to Production'){
-            steps {
-            	
-            	timeout(time:5, unit:'DAYS'){
-            		input message:'Approve PRODUCTION Deployment?'
-            	}
-            	
-                build job: 'Deploy-to-prod'         
-            }
-            
-            post {
-            	success {
-            	    echo 'Code deployed to Production.'
-            	}
-            	
-            	failure {
-            	    echo 'Deployment failed.'
-            	}
+        stage ('Deployments'){
+            parallel{
+                stage ('Deploy to Staging'){
+                    steps {
+                        sh "cp /c/Program Files (x86)/Jenkins/workspace/FullyAutomated/webapp/target/*.war /c/DevTools/apache-tomcat-8.5.29-staging/webapps"
+                    }
+                }
+
+                stage ("Deploy to Production"){
+                    steps {
+                        sh "cp /c/Program Files (x86)/Jenkins/workspace/FullyAutomated/webapp/target/*.war /c/DevTools/apache-tomcat-8.5.29-prod/webapps"
+                    }
+                }
             }
         }
     }
