@@ -28,13 +28,13 @@ stages{
             parallel{
                 stage ('Deploy to Staging'){
                     steps {
-                        sh "cp /c/Program Files (x86)/Jenkins/workspace/FullyAutomated/webapp/target/*.war /c/DevTools/apache-tomcat-8.5.29-staging/webapps"
+                        sh "cp **/target/*.war /c/DevTools/apache-tomcat-8.5.29-staging/webapps"
                     }
                 }
 
                 stage ("Deploy to Production"){
                     steps {
-                        sh "cp /c/Program Files (x86)/Jenkins/workspace/FullyAutomated/webapp/target/*.war /c/DevTools/apache-tomcat-8.5.29-prod/webapps"
+                        sh "cp **/target/*.war /c/DevTools/apache-tomcat-8.5.29-prod/webapps"
                     }
                 }
             }
